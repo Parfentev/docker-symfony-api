@@ -1,0 +1,29 @@
+version: "3.8"
+services:
+    nginx:
+        image: nginx:latest
+        env_file:
+            - .env
+        ports:
+            - "80:80"
+        volumes:
+            - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+            - ./site1:/var/www/site1
+        depends_on:
+            - php
+
+    php:
+        build:
+            context: ./docker/php
+        env_file:
+            - .env
+        volumes:
+            - ./site1:/var/www/site1
+
+    db:
+        image: mysql:latest
+        environment:
+            MYSQL_ROOT_PASSWORD: your_db_root_password
+            MYSQL_DATABASE: db_name
+            MYSQL_USER: db_user
+            MYSQL_PASSWORD: db_password
