@@ -34,4 +34,16 @@ class UsersController extends AbstractController
 
         return $this->json($user);
     }
+
+    #[Route('/users/current')]
+    public function current(): JsonResponse
+    {
+        return $this->json([]);
+    }
+
+    #[Route('/users/check', methods: 'POST')]
+    public function check(): JsonResponse
+    {
+        return $this->json([]);
+    }
 }
