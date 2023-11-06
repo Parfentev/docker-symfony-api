@@ -1,4 +1,9 @@
 .idea
-/*/vendor/
-/*/var/
-/*/public/bundles/
+/*/bin
+/*/config
+/*/migrations
+/*/public
+/*/public/bundles
+/*/src/*/.gitignore
+/*/var
+/*/vendor
