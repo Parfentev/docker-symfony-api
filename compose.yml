@@ -11,7 +11,6 @@ services:
             - ./site1:/var/www/site1
         depends_on:
             - php
-
     php:
         build:
             context: ./docker/php
@@ -19,11 +18,16 @@ services:
             - .env
         volumes:
             - ./site1:/var/www/site1
-
-    db:
-        image: mysql:latest
+    database:
+        image: postgres:${POSTGRES_VERSION:-15}-alpine
+        ports:
+            - "5432"
         environment:
-            MYSQL_ROOT_PASSWORD: your_db_root_password
-            MYSQL_DATABASE: db_name
-            MYSQL_USER: db_user
-            MYSQL_PASSWORD: db_password
+            POSTGRES_DB: ${POSTGRES_DB:-app}
+            # You should definitely change the password in production
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
+            POSTGRES_USER: ${POSTGRES_USER:-app}
+        volumes:
+            - database_data:/var/lib/postgresql/data:rw
+volumes:
+    database_data:

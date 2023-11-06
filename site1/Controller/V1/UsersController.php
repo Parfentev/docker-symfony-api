@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Controller\V1;
+namespace Controller\V1;
 
+use Repository\UsersRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -9,9 +10,17 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/api/v1')]
 class UsersController extends AbstractController
 {
+    private $usersRepository;
+
+    public function __construct(UsersRepository $usersRepository)
+    {
+        $this->usersRepository = $usersRepository;
+    }
+
     #[Route('/users')]
     public function users(): JsonResponse
     {
+        //$users = $this->usersRepo->findAll();
         $users = [
             [
                 'id' => 1

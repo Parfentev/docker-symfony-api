@@ -1,2 +1,4 @@
-site1/var
-site1/vendor
+.idea
+/*/vendor/
+/*/var/
+/*/public/bundles/
