@@ -1,8 +1,8 @@
 <?php
 
-namespace Controller\V1_1;
+namespace App\Controller\V1_1;
 
-use Controller\V1\UsersController as OldUsersController;
+use App\Controller\V1\UsersController as OldUsersController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 

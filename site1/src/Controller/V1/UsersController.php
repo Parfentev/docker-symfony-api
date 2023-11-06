@@ -1,8 +1,8 @@
 <?php
 
-namespace Controller\V1;
+namespace App\Controller\V1;
 
-use Repository\UsersRepository;
+use App\Repository\UsersRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
