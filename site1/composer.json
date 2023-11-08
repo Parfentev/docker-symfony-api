@@ -68,5 +68,8 @@
         "runtime": {
             "disable_dotenv": true
         }
+    },
+    "require-dev": {
+        "symfony/maker-bundle": "*"
     }
 }

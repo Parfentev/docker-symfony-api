@@ -3,45 +3,45 @@
 namespace App\Controller\V1;
 
 use App\Repository\UsersRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\String\ByteString;
 
 #[Route('/api/v1')]
 class UsersController extends AbstractController
 {
-    private $usersRepository;
+    private $repo;
 
     public function __construct(UsersRepository $usersRepository)
     {
-        $this->usersRepository = $usersRepository;
+        $this->repo = $usersRepository;
     }
 
     #[Route('/users')]
-    public function users(): JsonResponse
+    public function users(Request $request): JsonResponse
     {
-        //$users = $this->usersRepo->findAll();
-        $users = [
-            [
-                'id' => 1
-            ]
-        ];
+        $fields = $this->getParameterFields($request);
+        $filter = $request->query->get('filter');
+        $limit = $request->query->get('limit');
+        $sort = $request->query->get('sort');
 
-        return $this->json($users);
+        // Запрашиваем сущности
+        $data = $this->prepareItems($this->repo->findBy([]), $fields);
+
+        return $this->json($data);
     }
 
     #[Route('/users/{id}', requirements: ['id' => '\d+'])]
     #[Route('/users/{slug}', requirements: ['slug' => '\w+'])]
     public function user(?string $slug, ?int $id): JsonResponse
     {
-        //$this->repo->find($slug ?? $id);
+        $entity = $this->repo->find($slug ?? $id);
 
-        $user = [
-            'id'   => $id,
-            'slug' => $slug
-        ];
+        $fields = $request->query->get('fields') ?? ['all'];
 
-        return $this->json($user);
+        $item = $this->prepareItems($this->repo->findBy([]), $fields);
+        return $this->json($item);
     }
 
     #[Route('/users/current')]
