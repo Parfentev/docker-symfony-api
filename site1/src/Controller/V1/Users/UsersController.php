@@ -1,17 +1,18 @@
 <?php
 
-namespace App\Controller\V1;
+namespace App\Controller\V1\Users;
 
+use App\Controller\V1\AbstractController;
+use App\Exception\NotFoundException;
 use App\Repository\UsersRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\String\ByteString;
 
 #[Route('/api/v1')]
 class UsersController extends AbstractController
 {
-    private $repo;
+    private UsersRepository $repo;
 
     public function __construct(UsersRepository $usersRepository)
     {
@@ -19,7 +20,7 @@ class UsersController extends AbstractController
     }
 
     #[Route('/users')]
-    public function users(Request $request): JsonResponse
+    public function list(Request $request): JsonResponse
     {
         $collection = $this->repo->findBy([]);
         if (!$collection) {
@@ -37,9 +38,25 @@ class UsersController extends AbstractController
 
     #[Route('/users/{id}', requirements: ['id' => '\d+'])]
     #[Route('/users/{slug}', requirements: ['slug' => '\w+'])]
-    public function user(Request $request, ?string $slug, ?int $id): JsonResponse
+    public function read(Request $request, ?string $slug, ?int $id): JsonResponse
     {
-        $entity = $this->repo->find($slug ?? $id);
+        $entity = $id
+            ? $this->repo->find($id)
+            : $this->repo->findOneBy(['slug' => $slug]);
+
+        if (!$entity) {
+            throw new NotFoundException();
+        }
+
+        $fields = $this->getParameterFields($request);
+        $item   = $this->prepareItem($entity, $fields);
+        return $this->json($item);
+    }
+
+    #[Route('/users/{id}', requirements: ['id' => '\d+'], methods: ['PATCH'])]
+    public function update(Request $request, int $id): JsonResponse
+    {
+        $entity = $this->repo->find($id);
 
         if (!$entity) {
             return $this->json(['non']);
