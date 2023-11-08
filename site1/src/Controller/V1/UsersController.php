@@ -21,26 +21,32 @@ class UsersController extends AbstractController
     #[Route('/users')]
     public function users(Request $request): JsonResponse
     {
+        $collection = $this->repo->findBy([]);
+        if (!$collection) {
+            return $this->json([]);
+        }
+
         $fields = $this->getParameterFields($request);
         $filter = $request->query->get('filter');
-        $limit = $request->query->get('limit');
-        $sort = $request->query->get('sort');
+        $limit  = $request->query->get('limit');
+        $sort   = $request->query->get('sort');
 
-        // Запрашиваем сущности
-        $data = $this->prepareItems($this->repo->findBy([]), $fields);
-
+        $data = $this->prepareItems($collection, $fields);
         return $this->json($data);
     }
 
     #[Route('/users/{id}', requirements: ['id' => '\d+'])]
     #[Route('/users/{slug}', requirements: ['slug' => '\w+'])]
-    public function user(?string $slug, ?int $id): JsonResponse
+    public function user(Request $request, ?string $slug, ?int $id): JsonResponse
     {
         $entity = $this->repo->find($slug ?? $id);
 
-        $fields = $request->query->get('fields') ?? ['all'];
+        if (!$entity) {
+            return $this->json(['non']);
+        }
 
-        $item = $this->prepareItems($this->repo->findBy([]), $fields);
+        $fields = $this->getParameterFields($request);
+        $item   = $this->prepareItem($entity, $fields);
         return $this->json($item);
     }
 

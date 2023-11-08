@@ -36,7 +36,7 @@ class UserEntity extends AbstractEntity
     #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
     protected DateTime $updatedAt;
 
-    //protected string $uri;
+    protected string $uri;
 
     public function getCreatedAt(): int
     {
@@ -46,5 +46,16 @@ class UserEntity extends AbstractEntity
     public function getUpdatedAt(): int
     {
         return $this->updatedAt->getTimestamp();
+    }
+
+    public function getEmail(): string
+    {
+        $isAuth = true;
+        return $isAuth ? $this->email : '';
+    }
+
+    public function getUri(): string
+    {
+        return "/user/$this->slug/";
     }
 }
