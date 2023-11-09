@@ -2,20 +2,18 @@
 
 namespace App\Entity\Users;
 
-use App\Annotation\Hidden;
+use App\Annotation\{Guarded, Hidden};
 use App\Entity\AbstractEntity;
 use App\Repository\UsersRepository;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: UsersRepository::class)]
-#[ORM\Table(name: 'users')]
 #[ORM\HasLifecycleCallbacks]
+#[ORM\Entity(repositoryClass: UsersRepository::class), ORM\Table(name: 'users')]
 class UserEntity extends AbstractEntity
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[Guarded]
+    #[ORM\Id, ORM\GeneratedValue, ORM\Column]
     protected int $id;
 
     #[ORM\Column(length: 255)]
@@ -28,7 +26,7 @@ class UserEntity extends AbstractEntity
     #[ORM\Column(length: 255)]
     protected ?string $password = null;
 
-    #[Hidden]
+    #[Hidden, Guarded]
     #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
     protected DateTime $createdAt;
 
@@ -36,6 +34,7 @@ class UserEntity extends AbstractEntity
     #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
     protected DateTime $updatedAt;
 
+    #[Guarded]
     protected string $uri;
 
     public function getCreatedAt(): int

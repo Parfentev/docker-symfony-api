@@ -2,14 +2,14 @@
 
 namespace App\Service;
 
-use App\Annotation\Hidden;
+use App\Annotation\{Guarded, Hidden};
 use ReflectionClass;
 use ReflectionProperty;
 
 class EntitiesService
 {
     private array $properties = [];
-    private array $hidden     = [];
+    private array $guarded    = [];
     private array $allowed    = [];
 
     public function __construct($entity)
@@ -21,12 +21,8 @@ class EntitiesService
     private function parseProperties(): void
     {
         foreach ($this->properties as $property) {
-            if ($property->getAttributes(Hidden::class)) {
-                $this->hidden[] = $property->name;
-                continue;
-            }
-
-            $this->allowed[] = $property->name;
+            !$property->getAttributes(Hidden::class) && $this->allowed[] = $property->name;
+            $property->getAttributes(Guarded::class) && $this->guarded[] = $property->name;
         }
     }
 
@@ -44,5 +40,10 @@ class EntitiesService
     public function getAllowedFields(): array
     {
         return $this->allowed;
+    }
+
+    public function getGuarded(): array
+    {
+        return $this->guarded;
     }
 }

@@ -25,11 +25,11 @@ class AbstractController extends SymfonyController
      * Подготавливает сущность к выводу
      *
      * @param EntityInterface $entity
-     * @param array $fields
+     * @param array|null $fields
      *
      * @return array
      */
-    protected function prepareItem(EntityInterface $entity, array $fields): array
+    protected function prepareItem(EntityInterface $entity, ?array $fields = null): array
     {
         return $entity->toArray($fields);
     }

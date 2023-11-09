@@ -13,14 +13,8 @@ class UsersRepository extends ServiceEntityRepository
         parent::__construct($registry, UserEntity::class);
     }
 
-    // Дополнительные методы для работы с данными вашей сущности Users
-    public function findAllActiveUsers()
-    {
-        return $this->createQueryBuilder('u')
-            ->andWhere('u.isActive = :isActive')
-            ->setParameter('isActive', true)
-            ->getQuery()
-            ->getResult();
+    public function update() {
+
     }
 
     // Другие методы по мере необходимости

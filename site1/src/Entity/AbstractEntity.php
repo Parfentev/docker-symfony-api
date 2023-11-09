@@ -2,14 +2,16 @@
 
 namespace App\Entity;
 
-use App\Annotation\Hidden;
+use App\Annotation\{Guarded, Hidden};
 use App\Service\EntitiesService;
 use App\Util\StringUtil;
+use BadMethodCallException;
 use Doctrine\ORM\Mapping as ORM;
 
+#[ORM\HasLifecycleCallbacks]
 class AbstractEntity implements EntityInterface
 {
-    #[Hidden]
+    #[Hidden, Guarded]
     protected EntitiesService $entitiesService;
 
     #[ORM\PostLoad]
@@ -18,34 +20,14 @@ class AbstractEntity implements EntityInterface
         $this->entitiesService = new EntitiesService($this::class);
     }
 
-    public function __call($name, $params)
-    {
-        if (str_starts_with($name, 'get')) {
-            $columnName = lcfirst(substr($name, 3));
-            if (property_exists($this, $columnName)) {
-                return $this->{$columnName};
-            }
-        }
-
-        if (str_starts_with($name, 'set')) {
-            $columnName = lcfirst(substr($name, 3));
-            if (property_exists($this, $columnName)) {
-                //   $this->{$columnName} = $this->applyType($columnName, $params[0]);
-                //   return true;
-            }
-        }
-
-        throw new \BadMethodCallException(sprintf('Попытка вызвать несуществующий метод: %s.', $name));
-    }
-
     /**
      * Преобразует сущность в массив
      *
-     * @param $fields
+     * @param array|null $fields
      *
      * @return array
      */
-    public function toArray($fields): array
+    public function toArray(?array $fields = null): array
     {
         $item = [];
 
@@ -61,4 +43,30 @@ class AbstractEntity implements EntityInterface
         return $item;
     }
 
+    public function __call($name, $params)
+    {
+        $isGetter = str_starts_with($name, 'get');
+        $isSetter = str_starts_with($name, 'set');
+        $message  = "Попытка вызвать несуществующий метод: $name.";
+
+        if (!$isGetter && !$isSetter) {
+            throw new BadMethodCallException($message);
+        }
+
+        $columnName = lcfirst(substr($name, 3));
+        if (property_exists($this, $columnName)) {
+            if ($isGetter) {
+                return $this->{$columnName};
+            }
+
+            if ($isSetter) {
+                $fields = $this->entitiesService->getGuarded();
+                //$this->{$columnName} = $this->applyType($columnName, $params[0]);
+                !in_array($columnName, $fields) && $this->{$columnName} = $params[0];
+                return true;
+            }
+        }
+
+        throw new BadMethodCallException($message);
+    }
 }
