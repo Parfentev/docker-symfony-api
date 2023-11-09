@@ -2,16 +2,12 @@
 
 namespace App\Trait\Controller;
 
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @property ServiceEntityRepository $repo
- * @method array getParameterFields(Request $request)
- * @method array prepareItems(array $collection, array $fields)
- * @method JsonResponse json(array $item)
+ * Добавляет rout получения списков GET ".../{controller}"
  */
 trait ListTrait
 {
