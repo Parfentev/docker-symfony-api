@@ -19,6 +19,9 @@ class AccessEntity
 
     #[ORM\Column(type: 'string', length: 80)]
     private string $refreshToken;
+    #[ORM\Column(type: 'datetime')]
+    private string $refreshExpire;
+
     #[ORM\Column(type: 'string', length: 80)]
     private string $clientId;
 }
