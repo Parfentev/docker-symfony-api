@@ -42,6 +42,7 @@ class AbstractEntity implements EntityInterface
 
         foreach ($fields as $field) {
             $getter       = 'get' . StringUtil::toCamelCase($field, true);
+            $field        = StringUtil::toSnakeCase($field);
             $item[$field] = $this->{$getter}();
         }
 

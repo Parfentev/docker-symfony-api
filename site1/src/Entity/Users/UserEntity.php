@@ -18,12 +18,12 @@ class UserEntity extends AbstractEntity
     #[ORM\Column(length: 255)]
     protected string   $slug;
     #[ORM\Column(type: 'string', length: 180, unique: true)]
-    private ?string $email = null;
+    protected ?string $email = null;
     //#[ORM\Column(type: 'json')]
-    private array $roles = [];
+    protected ?string $roles = '';
     #[Hidden]
     #[ORM\Column(type: 'string')]
-    private ?string $password = null;
+    protected ?string $password = null;
     #[Hidden, Guarded]
     #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
     protected DateTime $createdAt;

@@ -13,31 +13,31 @@ use Doctrine\ORM\Mapping as ORM;
 class AccessEntity extends AbstractEntity
 {
     #[Guarded]
-    private int $lifeTime = 7200; //  2 часа
+    protected int $expiresIn = 7200; //  2 часа
     #[Hidden, Guarded]
-    private int $refreshLifeTime = 31556952; // 1 год
+    protected int $refreshExpiresIn = 31556952; // 1 год
 
     #[ORM\Id, ORM\Column(type: 'string', length: 80)]
-    private string $accessToken;
+    protected string $accessToken;
     #[Hidden]
     #[ORM\Column(type: 'datetime')]
-    private DateTime $expire;
+    protected DateTime $expiresAt;
 
     #[ORM\Column(type: 'string', length: 80)]
-    private string $refreshToken;
+    protected string $refreshToken;
     #[Hidden]
     #[ORM\Column(type: 'datetime')]
-    private DateTime $refreshExpire;
+    protected DateTime $refreshExpiresAt;
 
     #[Hidden]
     #[ORM\Column]
-    private int $userId;
+    protected int $userId;
     #[Hidden]
     #[ORM\Column(type: 'string', length: 255)]
-    private int $userData;
+    protected string $userData;
     #[Hidden]
     #[ORM\Column(type: 'string', length: 80)]
-    private string $clientId;
+    protected string $clientId;
 
     public function setExpire($time): void
     {
@@ -65,8 +65,8 @@ class AccessEntity extends AbstractEntity
         $this->refreshToken = 'refresh_test1';
 
         $time = time();
-        $this->setExpire($time + $this->lifeTime);
-        $this->setRefreshExpire($time + $this->refreshLifeTime);
+        $this->setExpire($time + $this->expiresIn);
+        $this->setRefreshExpire($time + $this->refreshExpiresIn);
 
         $this->userId   = $userId;
         $this->userData = 'useragent';

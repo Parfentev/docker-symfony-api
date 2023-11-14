@@ -57,13 +57,14 @@ class AuthController extends AbstractController
         if (!$actualEntity) {
             // Исключение
         }
-        $userId = $actualEntity->getUserId();
-        if (!$userId) {
+
+        //$userId = $actualEntity->getUserId();
+       // if (!$userId) {
             // Исключение
-        }
+      //  }
 
         $entity = (new AccessEntity())
-            ->generateToken($userId);
+            ->generateToken(1);
 
         $this->entityManager->persist($entity);
         //$this->entityManager->flush();
