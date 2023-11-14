@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/api/v1.1')]
+#[Route('/api/v1')]
 class AuthController extends AbstractController
 {
     private EntityRepository $accessRepo;
@@ -36,7 +36,7 @@ class AuthController extends AbstractController
             // Исключение
         }
 
-        $entities = $this->accessRepo->findBy(['refresh_token' =>  $fields['refresh_token']]);
+        $entities = $this->accessRepo->findBy(['refreshToken' =>  $fields['refresh_token']]);
         if ($entities) {
             // Токен не найден
             // Исключение
