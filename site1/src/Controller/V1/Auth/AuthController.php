@@ -4,8 +4,6 @@ namespace App\Controller\V1\Auth;
 
 use App\Controller\V1\AbstractController;
 use App\Entity\Auth\AccessEntity;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -13,13 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/api/v1')]
 class AuthController extends AbstractController
 {
-    private EntityRepository $accessRepo;
-
-    public function __construct(EntityManagerInterface $entityManager)
-    {
-        parent::__construct($entityManager);
-        $this->accessRepo = $entityManager->getRepository(AccessEntity::class);
-    }
+    protected string $entityClass = AccessEntity::class;
 
     #[Route('/users/auth', methods: 'POST')]
     public function auth(): JsonResponse
@@ -36,7 +28,7 @@ class AuthController extends AbstractController
             // Исключение
         }
 
-        $entities = $this->accessRepo->findBy(['refreshToken' =>  $fields['refresh_token']]);
+        $entities = $this->repo->findBy(['refreshToken' =>  $fields['refresh_token']]);
         if ($entities) {
             // Токен не найден
             // Исключение
@@ -67,7 +59,7 @@ class AuthController extends AbstractController
             ->generateToken(1);
 
         $this->entityManager->persist($entity);
-        //$this->entityManager->flush();
+        $this->entityManager->flush();
 
         $item = $this->prepareItem($entity);
         return $this->json($item);

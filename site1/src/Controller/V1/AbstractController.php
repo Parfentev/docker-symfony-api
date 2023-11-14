@@ -2,18 +2,23 @@
 
 namespace App\Controller\V1;
 
+use App\Entity\Auth\AccessEntity;
 use App\Entity\EntityInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as SymfonyController;
 use Symfony\Component\HttpFoundation\Request;
 
-class AbstractController extends SymfonyController
+abstract class AbstractController extends SymfonyController
 {
     protected EntityManagerInterface $entityManager;
+    protected string $entityClass;
+    protected EntityRepository $repo;
 
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
+        $this->repo          = $entityManager->getRepository($this->entityClass);
     }
 
     /**
