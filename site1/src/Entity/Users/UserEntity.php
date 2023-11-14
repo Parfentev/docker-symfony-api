@@ -4,7 +4,7 @@ namespace App\Entity\Users;
 
 use App\Annotation\{Guarded, Hidden};
 use App\Entity\AbstractEntity;
-use App\Repository\UsersRepository;
+use App\Repository\Users\UsersRepository;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -19,7 +19,7 @@ class UserEntity extends AbstractEntity
     protected string   $slug;
     #[ORM\Column(type: 'string', length: 180, unique: true)]
     private ?string $email = null;
-    #[ORM\Column(type: 'json')]
+    //#[ORM\Column(type: 'json')]
     private array $roles = [];
     #[Hidden]
     #[ORM\Column(type: 'string')]

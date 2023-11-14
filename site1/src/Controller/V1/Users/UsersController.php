@@ -3,7 +3,7 @@
 namespace App\Controller\V1\Users;
 
 use App\Controller\V1\AbstractController;
-use App\Repository\UsersRepository;
+use App\Repository\Users\UsersRepository;
 use App\Trait\Controller\{ListTrait, ReadTrait, UpdateTrait};
 use Symfony\Component\Routing\Annotation\Route;
 

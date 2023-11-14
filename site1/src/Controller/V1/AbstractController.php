@@ -3,11 +3,19 @@
 namespace App\Controller\V1;
 
 use App\Entity\EntityInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as SymfonyController;
 use Symfony\Component\HttpFoundation\Request;
 
 class AbstractController extends SymfonyController
 {
+    protected EntityManagerInterface $entityManager;
+
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->entityManager = $entityManager;
+    }
+
     /**
      * Подготавливает коллекцию сущностей к выводу
      *

@@ -14,6 +14,11 @@ class AbstractEntity implements EntityInterface
     #[Hidden, Guarded]
     protected EntitiesService $entitiesService;
 
+    public function __construct()
+    {
+        $this->init();
+    }
+
     #[ORM\PostLoad]
     public function init(): void
     {
