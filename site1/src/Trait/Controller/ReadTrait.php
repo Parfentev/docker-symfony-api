@@ -25,7 +25,6 @@ trait ReadTrait
         }
 
         $fields = $this->getParameterFields($request);
-        $item   = $this->prepareItem($entity, $fields);
-        return $this->json($item);
+        return $this->prepareItem($entity, $fields);
     }
 }

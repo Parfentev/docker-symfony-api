@@ -61,8 +61,7 @@ class AuthController extends AbstractController
         $this->entityManager->persist($entity);
         $this->entityManager->flush();
 
-        $item = $this->prepareItem($entity);
-        return $this->json($item);
+        return $this->prepareItem($entity);
     }
 
     #[Route('/users/logout', methods: 'POST')]

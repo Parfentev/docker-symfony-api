@@ -24,7 +24,6 @@ trait ListTrait
         $limit  = $request->query->get('limit');
         $sort   = $request->query->get('sort');
 
-        $data = $this->prepareItems($collection, $fields);
-        return $this->json($data);
+        return $this->prepareItems($collection, $fields);
     }
 }

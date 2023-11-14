@@ -7,6 +7,7 @@ use App\Entity\EntityInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as SymfonyController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 abstract class AbstractController extends SymfonyController
@@ -40,11 +41,11 @@ abstract class AbstractController extends SymfonyController
      * @param EntityInterface $entity
      * @param array|null $fields
      *
-     * @return array
+     * @return JsonResponse
      */
-    protected function prepareItem(EntityInterface $entity, ?array $fields = null): array
+    protected function prepareItem(EntityInterface $entity, ?array $fields = null): JsonResponse
     {
-        return $entity->toArray($fields);
+        return $this->json($entity->toArray($fields));
     }
 
     protected function getParameterFields(Request $request): array

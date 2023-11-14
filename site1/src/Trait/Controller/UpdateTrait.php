@@ -27,7 +27,6 @@ trait UpdateTrait
 
         $entityManager->flush();
 
-        $item = $this->prepareItem($entity);
-        return $this->json($item);
+        return $this->prepareItem($entity);
     }
 }
