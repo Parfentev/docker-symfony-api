@@ -4,12 +4,11 @@ namespace App\Entity\Users;
 
 use App\Annotation\{Guarded, Hidden};
 use App\Entity\AbstractEntity;
-use App\Repository\Users\UsersRepository;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\HasLifecycleCallbacks]
-#[ORM\Entity(repositoryClass: UsersRepository::class), ORM\Table(name: 'users')]
+#[ORM\Entity, ORM\Table(name: 'users')]
 class UserEntity extends AbstractEntity
 {
     #[Guarded]

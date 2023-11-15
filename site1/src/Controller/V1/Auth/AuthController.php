@@ -4,6 +4,11 @@ namespace App\Controller\V1\Auth;
 
 use App\Controller\V1\AbstractController;
 use App\Entity\Auth\AccessEntity;
+use App\Exception\CustomException;
+use App\Exception\InvalidArgumentException;
+use App\Exception\NotFoundException;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -25,15 +30,10 @@ class AuthController extends AbstractController
         $fields = json_decode($request->getContent(), true);
 
         if (empty($fields['refresh_token'])) {
-            // Исключение
+            throw new InvalidArgumentException("Отсутствующий параметр: 'refresh_token'");
         }
 
-        $entities = $this->repo->findBy(['refreshToken' =>  $fields['refresh_token']]);
-        if ($entities) {
-            // Токен не найден
-            // Исключение
-        }
-
+        $entities     = $this->repo->findBy(['refreshToken' =>  $fields['refresh_token']]);
         $actualEntity = null;
 
         // Отзываем все найденные токены
@@ -47,19 +47,33 @@ class AuthController extends AbstractController
         }
 
         if (!$actualEntity) {
-            // Исключение
+            throw new NotFoundException('Токен не найден или срок его жизни истек.');
         }
 
-        //$userId = $actualEntity->getUserId();
-       // if (!$userId) {
-            // Исключение
-      //  }
+        $userId = $actualEntity->getUserId();
+        if (!$userId) {
+            throw new NotFoundException('Пользователь не найден');
+        }
 
-        $entity = (new AccessEntity())
-            ->generateToken(1);
+        $entity      = new AccessEntity();
+        $maxAttempts = 3;
+        $attempts    = 0;
 
-        $this->entityManager->persist($entity);
-        $this->entityManager->flush();
+        do {
+            try {
+                $entity = $entity->generateTokens($userId);
+                $this->entityManager->persist($entity);
+                $this->entityManager->flush();
+                break;
+            } catch (UniqueConstraintViolationException|Exception $e) {
+                $attempts++;
+            }
+        } while ($attempts < $maxAttempts);
+
+        if ($attempts === $maxAttempts) {
+            throw new CustomException('Не удалось создать токен после нескольких попыток.');
+        }
+
 
         return $this->prepareItem($entity);
     }

@@ -7,6 +7,7 @@ use App\Annotation\Hidden;
 use App\Entity\AbstractEntity;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
 
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Entity, ORM\Table(name: 'oauth_access')]
@@ -17,13 +18,13 @@ class AccessEntity extends AbstractEntity
     #[Hidden, Guarded]
     protected int $refreshExpiresIn = 31556952; // 1 год
 
-    #[ORM\Id, ORM\Column(type: 'string', length: 80)]
+    #[ORM\Id, ORM\Column(type: 'string', length: 80, unique: true)]
     protected string $accessToken;
     #[Hidden]
     #[ORM\Column(type: 'datetime')]
     protected DateTime $expiresAt;
 
-    #[ORM\Column(type: 'string', length: 80)]
+    #[ORM\Column(type: 'string', length: 80, unique: true)]
     protected string $refreshToken;
     #[Hidden]
     #[ORM\Column(type: 'datetime')]
@@ -41,28 +42,34 @@ class AccessEntity extends AbstractEntity
 
     public function setExpire($time): void
     {
-        $this->expire = DateTime::createFromFormat('U', $time);
+        $this->expiresAt = DateTime::createFromFormat('U', $time);
     }
 
     public function getExpire(): int
     {
-        return $this->expire->getTimestamp();
+        return $this->expiresAt->getTimestamp();
     }
 
     public function setRefreshExpire($time): void
     {
-        $this->refreshExpire = DateTime::createFromFormat('U', $time);
+        $this->refreshExpiresAt = DateTime::createFromFormat('U', $time);
     }
 
     public function getRefreshExpire(): int
     {
-        return $this->refreshExpire->getTimestamp();
+        return $this->refreshExpiresAt->getTimestamp();
     }
 
-    public function generateToken(int $userId): static
+    /**
+     * @param int $userId
+     *
+     * @return $this
+     * @throws Exception
+     */
+    public function generateTokens(int $userId): static
     {
-        $this->accessToken  = 'access_test1';
-        $this->refreshToken = 'refresh_test1';
+        $this->accessToken  = $this->generateToken($userId);
+        $this->refreshToken = $this->generateToken($userId);
 
         $time = time();
         $this->setExpire($time + $this->expiresIn);
@@ -73,5 +80,18 @@ class AccessEntity extends AbstractEntity
         $this->clientId = 'test';
 
         return $this;
+    }
+
+    /**
+     * @param $userId
+     *
+     * @return string
+     * @throws Exception
+     */
+    private function generateToken($userId): string
+    {
+        $data = hash('sha256', $userId) . random_bytes(16);
+        // Подпись данных с использованием секретного ключа
+        return hash_hmac('sha256', $data, getenv('APP_SECRET') ?: '');
     }
 }

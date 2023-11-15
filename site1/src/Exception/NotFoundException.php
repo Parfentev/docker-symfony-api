@@ -11,5 +11,5 @@ class NotFoundException extends RuntimeException
     protected $code = 2;
     /** @var string */
     protected  $message    = 'Данные не найдены.';
-    public int $statusCode = Response::HTTP_OK;
+    public int $statusCode = Response::HTTP_NOT_FOUND;
 }
