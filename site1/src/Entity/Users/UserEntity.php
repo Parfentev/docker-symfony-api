@@ -2,6 +2,7 @@
 
 namespace App\Entity\Users;
 
+use App\Service\AuthService;
 use App\Annotation\{Guarded, Hidden};
 use App\Entity\AbstractEntity;
 use DateTime;
@@ -42,10 +43,14 @@ class UserEntity extends AbstractEntity
         return $this->updatedAt->getTimestamp();
     }
 
+    public function setPassword($value): void
+    {
+        $this->password = md5($value);
+    }
+
     public function getEmail(): string
     {
-        $isAuth = true;
-        return $isAuth ? $this->email : '';
+        return AuthService::getCurrentUserId() === $this->id ? $this->email : '';
     }
 
     public function getUri(): string

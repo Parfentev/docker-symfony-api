@@ -2,9 +2,11 @@
 
 namespace App\EventSubscriber;
 
+use App\Entity\Auth\AccessEntity;
+use App\Service\AuthService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -14,6 +16,13 @@ use Symfony\Component\HttpKernel\KernelEvents;
 #[AsEventListener(event: KernelEvents::CONTROLLER, method: 'onController')]
 class ApiSubscriber
 {
+    private EntityManagerInterface $entityManager;
+
+    public function __construct(EntityManagerInterface $entityManager)
+    {
+        $this->entityManager = $entityManager;
+    }
+
     public function onApiException(ExceptionEvent $event): void
     {
         if (!str_starts_with($event->getRequest()->getPathInfo(), '/api/')) {
@@ -38,10 +47,15 @@ class ApiSubscriber
         }
 
         $authorizationHeader = $request->headers->get('Authorization');
-
-        if ($authorizationHeader && preg_match('/Bearer\s+(.+)/i', $authorizationHeader, $matches)) {
-            $accessToken = $matches[1];
-        } else {
+        if (!$authorizationHeader || !preg_match('/Bearer\s+(.+)/i', $authorizationHeader, $matches)) {
+            return;
         }
+
+        $entity = $this->entityManager->getRepository(AccessEntity::class)->find($matches[1]);
+        if (!$entity || $entity->getExpire() > time()) {
+            return;
+        }
+
+        AuthService::setCurrentUserId($entity->getId());
     }
 }
