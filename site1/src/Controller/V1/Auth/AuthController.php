@@ -7,6 +7,7 @@ use App\Entity\Auth\AccessEntity;
 use App\Exception\CustomException;
 use App\Exception\InvalidArgumentException;
 use App\Exception\NotFoundException;
+use App\Service\AuthService;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -83,14 +84,17 @@ class AuthController extends AbstractController
     #[Route('/users/logout', methods: 'POST')]
     public function logout(): JsonResponse
     {
-        $params = json_decode($request->getContent(), true);
-        if (empty($params['refresh_token'])) {
-            throw new InvalidArgumentException("Отсутствующий параметр: 'refresh_token'");
+        $token = AuthService::getToken();
+        if (!$token) {
+            $this->json(['success' => false]);
         }
 
+        $entity = $this->repo->find($token);
+        if ($entity) {
+            $this->entityManager->remove($entity);
+            $this->entityManager->flush();
+        }
 
-        return $this->json([]);
+        return $this->json(['success' => true]);
     }
-
-
 }
