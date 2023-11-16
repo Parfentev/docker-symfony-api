@@ -19,21 +19,23 @@ class AuthController extends AbstractController
     protected string $entityClass = AccessEntity::class;
 
     #[Route('/users/auth', methods: 'POST')]
-    public function auth(): JsonResponse
+    public function auth(Request $request): JsonResponse
     {
+        $params = json_decode($request->getContent(), true);
+
         return $this->json([]);
     }
 
     #[Route('/users/refresh', methods: 'POST')]
     public function refresh(Request $request): JsonResponse
     {
-        $fields = json_decode($request->getContent(), true);
+        $params = json_decode($request->getContent(), true);
 
-        if (empty($fields['refresh_token'])) {
+        if (empty($params['refresh_token'])) {
             throw new InvalidArgumentException("Отсутствующий параметр: 'refresh_token'");
         }
 
-        $entities     = $this->repo->findBy(['refreshToken' =>  $fields['refresh_token']]);
+        $entities     = $this->repo->findBy(['refreshToken' =>  $params['refresh_token']]);
         $actualEntity = null;
 
         // Отзываем все найденные токены
@@ -81,6 +83,12 @@ class AuthController extends AbstractController
     #[Route('/users/logout', methods: 'POST')]
     public function logout(): JsonResponse
     {
+        $params = json_decode($request->getContent(), true);
+        if (empty($params['refresh_token'])) {
+            throw new InvalidArgumentException("Отсутствующий параметр: 'refresh_token'");
+        }
+
+
         return $this->json([]);
     }
 }
