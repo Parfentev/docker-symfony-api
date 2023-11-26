@@ -12,8 +12,8 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 trait ReadTrait
 {
-    #[Route('/{controller}/{id}', requirements: ['id' => '\d+'], methods: ['GET'])]
-    #[Route('/{controller}/{slug}', requirements: ['slug' => '\w+'], methods: ['GET'])]
+    #[Route('/{id}', requirements: ['id' => '\d+'], methods: 'GET')]
+    #[Route('/{slug}', requirements: ['slug' => '\w+'], methods: 'GET', )]
     public function read(Request $request, ?string $slug, ?int $id): JsonResponse
     {
         $entity = $id

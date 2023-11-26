@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 trait UpdateTrait
 {
-    #[Route('/{controller}/{id}', requirements: ['id' => '\d+'], methods: ['PATCH'])]
+    #[Route('/{id}', requirements: ['id' => '\d+'], methods: 'PATCH')]
     public function update(EntityManagerInterface $entityManager, Request $request, int $id): JsonResponse
     {
         $entity = $this->repo->find($id);

@@ -14,12 +14,12 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/api/v1')]
+#[Route('/api/v1/users')]
 class AuthController extends AbstractController
 {
     protected string $entityClass = AccessEntity::class;
 
-    #[Route('/users/auth', methods: 'POST')]
+    #[Route('/auth', methods: 'POST')]
     public function auth(Request $request): JsonResponse
     {
         $params = json_decode($request->getContent(), true);
@@ -27,7 +27,7 @@ class AuthController extends AbstractController
         return $this->json([]);
     }
 
-    #[Route('/users/refresh', methods: 'POST')]
+    #[Route('/refresh', methods: 'POST')]
     public function refresh(Request $request): JsonResponse
     {
         $params = json_decode($request->getContent(), true);
@@ -81,7 +81,7 @@ class AuthController extends AbstractController
         return $this->prepareItem($entity);
     }
 
-    #[Route('/users/logout', methods: 'POST')]
+    #[Route('/logout', methods: 'POST')]
     public function logout(): JsonResponse
     {
         $token = AuthService::getToken();

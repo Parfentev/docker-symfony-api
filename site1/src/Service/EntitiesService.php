@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\Annotation\{Guarded, Hidden};
+use App\Annotation\EntityProperty;
 use ReflectionClass;
 use ReflectionProperty;
 
@@ -21,8 +21,19 @@ class EntitiesService
     private function parseProperties(): void
     {
         foreach ($this->properties as $property) {
-            !$property->getAttributes(Hidden::class) && $this->allowed[] = $property->name;
-            $property->getAttributes(Guarded::class) && $this->guarded[] = $property->name;
+            $isHidden = $isGuarded = false;
+
+            $attributes = $property->getAttributes(EntityProperty::class);
+            if (!empty($attributes)) {
+                $attribute = reset($attributes);
+                $instance  = $attribute->newInstance();
+
+                $isHidden  = $instance->isHidden();
+                $isGuarded = $instance->isGuarded();
+            }
+
+            !$isHidden && $this->allowed[] = $property->name;
+            $isGuarded && $this->guarded[] = $property->name;
         }
     }
 

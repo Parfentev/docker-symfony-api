@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 trait ListTrait
 {
-    #[Route('/{controller}')]
+    #[Route('', methods: 'GET')]
     public function list(Request $request): JsonResponse
     {
         $collection = $this->repo->findBy([]);

@@ -7,7 +7,7 @@ use App\Entity\Users\UserEntity;
 use App\Trait\Controller\{ListTrait, ReadTrait, UpdateTrait};
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/api/v1', requirements: ['controller' => 'users'])]
+#[Route('/api/v1/users')]
 class UsersController extends AbstractController
 {
     use ListTrait, ReadTrait, UpdateTrait;

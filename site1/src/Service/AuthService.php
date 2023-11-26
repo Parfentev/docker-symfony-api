@@ -6,8 +6,8 @@ use App\Exception\ForbiddenException;
 
 class AuthService
 {
-    private static ?int    $userId;
-    private static ?string $token;
+    private static ?int    $userId = null;
+    private static ?string $token = null;
 
     static public function getCurrentUserId(): ?int
     {

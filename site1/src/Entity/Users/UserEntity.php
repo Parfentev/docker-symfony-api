@@ -2,9 +2,9 @@
 
 namespace App\Entity\Users;
 
-use App\Service\AuthService;
-use App\Annotation\{Guarded, Hidden};
+use App\Annotation\EntityProperty;
 use App\Entity\AbstractEntity;
+use App\Service\AuthService;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -12,25 +12,25 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity, ORM\Table(name: 'users')]
 class UserEntity extends AbstractEntity
 {
-    #[Guarded]
+    #[EntityProperty(guard: true)]
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]
-    protected int      $id;
+    protected int     $id;
     #[ORM\Column(length: 255)]
-    protected string   $slug;
+    protected string  $slug;
     #[ORM\Column(type: 'string', length: 180, unique: true)]
     protected ?string $email = null;
     //#[ORM\Column(type: 'json')]
-    protected ?string $roles = '';
-    #[Hidden]
+    protected ?string  $roles    = '';
+    #[EntityProperty(hide: true)]
     #[ORM\Column(type: 'string')]
-    protected ?string $password = null;
-    #[Hidden, Guarded]
+    protected ?string  $password = null;
+    #[EntityProperty(hide: true, guard: true)]
     #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
     protected DateTime $createdAt;
-    #[Hidden]
+    #[EntityProperty(hide: true)]
     #[ORM\Column(type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
     protected DateTime $updatedAt;
-    #[Guarded]
+    #[EntityProperty(guard: true)]
     protected string   $uri;
 
     public function getCreatedAt(): int

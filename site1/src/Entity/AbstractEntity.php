@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Annotation\{Guarded, Hidden};
+use App\Annotation\EntityProperty;
 use App\Service\EntitiesService;
 use App\Util\StringUtil;
 use BadMethodCallException;
@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\HasLifecycleCallbacks]
 class AbstractEntity implements EntityInterface
 {
-    #[Hidden, Guarded]
+    #[EntityProperty(hide: true, guard: true)]
     protected EntitiesService $entitiesService;
 
     public function __construct()

@@ -28,11 +28,11 @@ abstract class AbstractController extends SymfonyController
      * @param EntityInterface[] $collection
      * @param array $fields
      *
-     * @return array
+     * @return JsonResponse
      */
-    protected function prepareItems(array $collection, array $fields): array
+    protected function prepareItems(array $collection, array $fields): JsonResponse
     {
-        return array_map(fn($entity) => $this->prepareItem($entity, $fields), $collection);
+        return $this->json(array_map(fn($entity) => $entity->toArray($fields), $collection));
     }
 
     /**

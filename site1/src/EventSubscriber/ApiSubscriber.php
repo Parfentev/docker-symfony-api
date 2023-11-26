@@ -52,10 +52,10 @@ class ApiSubscriber
         }
 
         $entity = $this->entityManager->getRepository(AccessEntity::class)->find($matches[1]);
-        if (!$entity || $entity->getExpire() > time()) {
+        if (!$entity || $entity->getExpiresAt() <= time()) {
             return;
         }
 
-        AuthService::setCurrentUserId($entity->getId());
+        AuthService::setCurrentUserId($entity->getUserId());
     }
 }

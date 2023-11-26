@@ -2,8 +2,7 @@
 
 namespace App\Entity\Auth;
 
-use App\Annotation\Guarded;
-use App\Annotation\Hidden;
+use App\Annotation\EntityProperty;
 use App\Entity\AbstractEntity;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
@@ -13,44 +12,44 @@ use Exception;
 #[ORM\Entity, ORM\Table(name: 'oauth_access')]
 class AccessEntity extends AbstractEntity
 {
-    #[Guarded]
+    #[EntityProperty(guard: true)]
     protected int $expiresIn = 7200; //  2 часа
-    #[Hidden, Guarded]
+    #[EntityProperty(hide: true, guard: true)]
     protected int $refreshExpiresIn = 31556952; // 1 год
 
     #[ORM\Id, ORM\Column(type: 'string', length: 80, unique: true)]
     protected string $accessToken;
-    #[Hidden]
+    #[EntityProperty(hide: true)]
     #[ORM\Column(type: 'datetime')]
     protected DateTime $expiresAt;
 
     #[ORM\Column(type: 'string', length: 80, unique: true)]
     protected string $refreshToken;
-    #[Hidden]
+    #[EntityProperty(hide: true)]
     #[ORM\Column(type: 'datetime')]
     protected DateTime $refreshExpiresAt;
 
-    #[Hidden]
+    #[EntityProperty(hide: true)]
     #[ORM\Column]
     protected int $userId;
-    #[Hidden]
+    #[EntityProperty(hide: true)]
     #[ORM\Column(type: 'string', length: 255)]
     protected string $userData;
-    #[Hidden]
+    #[EntityProperty(hide: true)]
     #[ORM\Column(type: 'string', length: 80)]
     protected string $clientId;
 
-    public function setExpire($time): void
+    public function setExpiresAt($time): void
     {
         $this->expiresAt = DateTime::createFromFormat('U', $time);
     }
 
-    public function getExpire(): int
+    public function getExpiresAt(): int
     {
         return $this->expiresAt->getTimestamp();
     }
 
-    public function setRefreshExpire($time): void
+    public function setRefreshExpiresAt($time): void
     {
         $this->refreshExpiresAt = DateTime::createFromFormat('U', $time);
     }
