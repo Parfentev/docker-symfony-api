@@ -32,6 +32,8 @@ class UserEntity extends AbstractEntity
     protected DateTime $updatedAt;
     #[EntityProperty(guard: true)]
     protected string   $uri;
+    #[EntityProperty(hide: true)]
+    protected ?int     $code;
 
     public function getCreatedAt(): int
     {
@@ -46,6 +48,21 @@ class UserEntity extends AbstractEntity
     public function setPassword($value): void
     {
         $this->password = md5($value);
+    }
+
+    public function comparePassword($value): bool
+    {
+        return $this->password === md5($value);
+    }
+
+    public function setCode($value): void
+    {
+        $this->code = md5($value);
+    }
+
+    public function compareCode($value): bool
+    {
+        return $this->code === md5($value);
     }
 
     public function getEmail(): string

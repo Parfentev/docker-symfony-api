@@ -22,6 +22,29 @@ class AuthController extends AbstractController
 {
     protected string $entityClass = AccessEntity::class;
 
+    #[Route('/send_code', methods: 'POST')]
+    public function sendCode(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $params = json_decode($request->getContent(), true);
+
+        $repo = $entityManager->getRepository(UserEntity::class);
+        if (isset($params['email'])) {
+            $entity = $repo->findOneBy(['email' => $params['email']]);
+        } elseif (isset($params['phone'])) {
+            //$entity = $repo->findOneBy(['phone' => $params['phone']]);
+        }
+
+        if (empty($entity)) {
+            //Регистрация
+        }
+
+        $entity->generateCode();
+        //Отправка кода
+        $entityManager->flush();
+
+        return $this->json(['success' => true]);
+    }
+
     #[Route('/auth', methods: 'POST')]
     public function auth(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
