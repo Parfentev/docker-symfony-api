@@ -57,5 +57,6 @@ class ApiSubscriber
         }
 
         AuthService::setCurrentUserId($entity->getUserId());
+        AuthService::setToken($entity->getAccessToken());
     }
 }

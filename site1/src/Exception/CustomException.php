@@ -7,7 +7,7 @@ use RuntimeException;
 class CustomException extends RuntimeException
 {
     /** @var int */
-    protected $code = 7;
+    protected $code = 1;
     /** @var string */
     protected $message = 'Неизвестная ошибка.';
 }

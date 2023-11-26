@@ -71,11 +71,11 @@ class AccessEntity extends AbstractEntity
         $this->refreshToken = $this->generateToken($userId);
 
         $time = time();
-        $this->setExpire($time + $this->expiresIn);
-        $this->setRefreshExpire($time + $this->refreshExpiresIn);
+        $this->setExpiresAt($time + $this->expiresIn);
+        $this->setRefreshExpiresAt($time + $this->refreshExpiresIn);
 
         $this->userId   = $userId;
-        $this->userData = 'useragent';
+        $this->userData = $_SERVER['HTTP_USER_AGENT'] ?? '';
         $this->clientId = 'test';
 
         return $this;
