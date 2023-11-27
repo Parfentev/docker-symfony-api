@@ -4,6 +4,7 @@ namespace App\Controller\V1\Auth;
 
 use App\Controller\V1\AbstractController;
 use App\Entity\Auth\AccessEntity;
+use App\Entity\Auth\CodeEntity;
 use App\Entity\Users\UserEntity;
 use App\Exception\CustomException;
 use App\Exception\InvalidArgumentException;
@@ -11,7 +12,6 @@ use App\Exception\InvalidCredentialsException;
 use App\Exception\NotFoundException;
 use App\Service\AuthService;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,45 +22,19 @@ class AuthController extends AbstractController
 {
     protected string $entityClass = AccessEntity::class;
 
-    #[Route('/send_code', methods: 'POST')]
-    public function sendCode(Request $request, EntityManagerInterface $entityManager): JsonResponse
-    {
-        $params = json_decode($request->getContent(), true);
-
-        $repo = $entityManager->getRepository(UserEntity::class);
-        if (isset($params['email'])) {
-            $entity = $repo->findOneBy(['email' => $params['email']]);
-        } elseif (isset($params['phone'])) {
-            //$entity = $repo->findOneBy(['phone' => $params['phone']]);
-        }
-
-        if (empty($entity)) {
-            //Регистрация
-        }
-
-        $entity->generateCode();
-        //Отправка кода
-        $entityManager->flush();
-
-        return $this->json(['success' => true]);
-    }
-
     #[Route('/auth', methods: 'POST')]
-    public function auth(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    public function auth(Request $request): JsonResponse
     {
-        $params = json_decode($request->getContent(), true);
+        $params    = json_decode($request->getContent(), true);
+        $grantType = $params['grant_type'] ?? 'email_password';
 
-        $entity = $entityManager->getRepository(UserEntity::class)->findOneBy([
-            'email'    => $params['email'],
-            'password' => md5($params['password'])
-        ]);
-
-        if (!$entity) {
-            throw new InvalidCredentialsException();
-        }
+        $entity = match ($grantType) {
+            'email_and_password' => $this->authByEmailAndPassword($params),
+            'email_code'         => $this->authByEmailCode($params),
+            default              => throw new InvalidCredentialsException('Тип гранта не поддерживается.')
+        };
 
         $entity = $this->generateTokens($entity->getId());
-
         return $this->prepareItem($entity);
     }
 
@@ -81,7 +55,7 @@ class AuthController extends AbstractController
             $this->entityManager->remove($entity);
             $this->entityManager->flush();
 
-            if ($entity->getRefreshExpire() > time()) {
+            if ($entity->getRefreshExpiresAt() > time()) {
                 $actualEntity = $entity;
             }
         }
@@ -122,6 +96,33 @@ class AuthController extends AbstractController
         return $this->json(['success' => true]);
     }
 
+    public function sendCode(Request $request): JsonResponse
+    {
+        $params = json_decode($request->getContent(), true);
+
+        $args = isset($params['email'])
+            ? ['email' => $params['email']]
+            : (isset($params['phone']) ? ['phone' => $params['phone']] : []);
+
+        //TODO: исключение валидация
+
+        $entity = $this->entityManager->getRepository(UserEntity::class)->findOneBy($args);
+        if (empty($entity)) {
+            $entity = (new UserEntity())
+                ->fromArray($args)
+                ->generatePassword();
+
+            $this->entityManager->persist($entity);
+            $this->entityManager->flush();
+        }
+
+        $entity->generateCode();
+        //Отправка кода
+        $this->entityManager->flush();
+
+        return $this->json(['success' => true]);
+    }
+
     /**
      * Генерирует сущность с токенами
      *
@@ -137,7 +138,7 @@ class AuthController extends AbstractController
 
         do {
             try {
-                $entity = $entity->generateTokens($userId);
+                $entity->generateTokens($userId);
                 $this->entityManager->persist($entity);
                 $this->entityManager->flush();
                 break;
@@ -148,6 +149,58 @@ class AuthController extends AbstractController
 
         if ($attempts === $maxAttempts) {
             throw new CustomException('Не удалось создать токен после нескольких попыток.');
+        }
+
+        return $entity;
+    }
+
+    private function authByEmailAndPassword(array $params): UserEntity
+    {
+        //TODO: исключение валидация
+
+        $entity = $this->entityManager
+            ->getRepository(UserEntity::class)
+            ->findOneBy(['email' => $params['email']]);
+
+        if (!$entity) {
+            throw new NotFoundException();
+        }
+
+        if (!$entity->comparePassword($params['password'] ?? '')) {
+            throw new InvalidCredentialsException();
+        }
+
+        return $entity;
+    }
+
+    private function authByEmailCode(array $params): UserEntity
+    {
+        // TODO: исключение валидация
+
+        $entity = $this->entityManager
+            ->getRepository(UserEntity::class)
+            ->findOneBy(['email' => $params['email']]);
+
+        if (!$entity) {
+            throw new NotFoundException();
+        }
+
+        // TODO: Отправить код, если не указан
+
+        $codeEntity = $this->entityManager->getRepository(CodeEntity::class)->findOneBy([
+            'usedIn' => 'email',
+            'code'   => $params['code'],
+            'userId' => $entity->getId()
+        ]);
+
+        // TODO: код не найден
+
+        // Удаляем код
+        $this->entityManager->remove($codeEntity);
+        $this->entityManager->flush();
+
+        if ($codeEntity->getExpiresAt() > time()) {
+            throw new InvalidCredentialsException('Код устарел.');
         }
 
         return $entity;

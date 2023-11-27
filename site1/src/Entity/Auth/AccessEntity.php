@@ -54,7 +54,7 @@ class AccessEntity extends AbstractEntity
         $this->refreshExpiresAt = DateTime::createFromFormat('U', $time);
     }
 
-    public function getRefreshExpire(): int
+    public function getRefreshExpiresAt(): int
     {
         return $this->refreshExpiresAt->getTimestamp();
     }

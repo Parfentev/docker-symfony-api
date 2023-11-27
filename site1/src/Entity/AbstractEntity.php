@@ -49,6 +49,22 @@ class AbstractEntity implements EntityInterface
         return $item;
     }
 
+    public function fromArray(array $data): static
+    {
+        if (!$data) {
+            return $this;
+        }
+
+        $columns = $data;
+
+        foreach ($columns as $column => $value) {
+            $setter = 'set' . StringUtil::toCamelCase($column, true);
+            $this->{$setter}($value);
+        }
+
+        return $this;
+    }
+
     public function __call($name, $params)
     {
         $isGetter = str_starts_with($name, 'get');

@@ -2,7 +2,6 @@
 
 namespace App\Controller\V1;
 
-use App\Entity\Auth\AccessEntity;
 use App\Entity\EntityInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;

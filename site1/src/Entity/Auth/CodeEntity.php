@@ -2,19 +2,18 @@
 
 namespace App\Entity\Auth;
 
-use App\Annotation\EntityProperty;
 use App\Entity\AbstractEntity;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
 
 #[ORM\HasLifecycleCallbacks]
-#[ORM\Entity, ORM\Table(name: 'oauth_access')]
+#[ORM\Entity, ORM\Table(name: 'verification_codes')]
 class CodeEntity extends AbstractEntity
 {
-    protected int $expiresIn = 300;
+    protected int $expiresIn = 300; // 5 мин
     #[ORM\Column]
-    protected int $userId;//  2 часа
+    protected int $userId;
     #[ORM\Column]
     protected int $code;
     #[ORM\Column(type: 'datetime')]
