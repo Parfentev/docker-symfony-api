@@ -2,10 +2,7 @@
 
 namespace App\Service;
 
-use App\Entity\Users\UserEntity;
 use App\Exception\ForbiddenException;
-use App\Exception\InvalidCredentialsException;
-use Doctrine\ORM\EntityManagerInterface;
 
 class AuthService
 {
@@ -45,12 +42,5 @@ class AuthService
         }
 
         return true;
-    }
-
-    public function authByMail(EntityManagerInterface $entityManager, string $email, string $password)
-    {
-
-
-        $entity = $this->generateTokens($entity->getId());
     }
 }

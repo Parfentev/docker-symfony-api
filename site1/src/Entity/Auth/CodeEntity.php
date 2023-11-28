@@ -7,19 +7,38 @@ use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
 
+/**
+ * @method setCode($value)
+ * @method setUserData($value)
+ */
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Entity, ORM\Table(name: 'verification_codes')]
 class CodeEntity extends AbstractEntity
 {
     protected int $expiresIn = 300; // 5 мин
-    #[ORM\Column]
+    #[ORM\Id, ORM\Column]
     protected int $userId;
+    #[ORM\Id, ORM\Column]
+    protected string $usedIn;
     #[ORM\Column]
     protected int $code;
     #[ORM\Column(type: 'datetime')]
     protected DateTime $expiresAt;
     #[ORM\Column(type: 'string', length: 255)]
     protected string $userData;
+
+    /**
+     * @throws Exception
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $time = time();
+
+        $this->setCode(hexdec(bin2hex(random_bytes(2))) % 9000 + 1000);
+        $this->setUserData($_SERVER['HTTP_USER_AGENT'] ?? '');
+        $this->setExpiresAt($time + $this->expiresIn);
+    }
 
     public function setExpiresAt($time): void
     {
@@ -31,16 +50,8 @@ class CodeEntity extends AbstractEntity
         return $this->expiresAt->getTimestamp();
     }
 
-    /**
-     * Генерирует 4 значный код
-     *
-     * @return $this
-     * @throws Exception
-     */
-    public function generateCode(): static
+    public function compareCode($value): bool
     {
-        $this->code     = hexdec(bin2hex(random_bytes(2))) % 9000 + 1000;
-        $this->userData = $_SERVER['HTTP_USER_AGENT'] ?? '';
-        return $this;
+        return $this->code === $value;
     }
 }
