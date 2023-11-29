@@ -6,6 +6,7 @@ use App\Annotation\EntityProperty;
 use App\Service\EntitiesService;
 use App\Util\StringUtil;
 use BadMethodCallException;
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\HasLifecycleCallbacks]
@@ -49,6 +50,13 @@ class AbstractEntity implements EntityInterface
         return $item;
     }
 
+    /**
+     * Заполнение сущности данными
+     *
+     * @param array $data
+     *
+     * @return $this
+     */
     public function fromArray(array $data): static
     {
         if (!$data) {
@@ -65,6 +73,14 @@ class AbstractEntity implements EntityInterface
         return $this;
     }
 
+    /**
+     * Обрабатывает вызовы несуществующих методов
+     *
+     * @param $name
+     * @param $params
+     *
+     * @return $this|mixed
+     */
     public function __call($name, $params)
     {
         $isGetter = str_starts_with($name, 'get');
@@ -77,18 +93,60 @@ class AbstractEntity implements EntityInterface
 
         $columnName = lcfirst(substr($name, 3));
         if (property_exists($this, $columnName)) {
-            if ($isGetter) {
-                return $this->{$columnName};
-            }
+             if ($isGetter) {
+                 return $this->getter($columnName);
+             }
 
             if ($isSetter) {
-                $fields = $this->entitiesService->getGuarded();
-                //$this->{$columnName} = $this->applyType($columnName, $params[0]);
-                !in_array($columnName, $fields) && $this->{$columnName} = $params[0];
-                return true;
+                $this->setter($columnName, $params);
+                return $this;
             }
         }
 
         throw new BadMethodCallException($message);
+    }
+
+    /**
+     * Отдает значение свойства
+     *
+     * @param $columnName
+     *
+     * @return mixed
+     */
+    private function getter($columnName): mixed
+    {
+        $columnType = $this->entitiesService->getPropertyType($columnName);
+
+        if ($columnType === 'DateTime') {
+            return $this->{$columnName}->getTimestamp();
+        }
+
+        return $this->{$columnName};
+    }
+
+    /**
+     * Заполняет свойство
+     *
+     * @param $columnName
+     * @param $params
+     *
+     * @return void
+     */
+    private function setter($columnName, $params): void
+    {
+        $columnType = $this->entitiesService->getPropertyType($columnName);
+        //$this->{$columnName} = $this->applyType($columnName, $params[0]);
+
+        // Нельзя заполнять поле
+        if (in_array($columnName, $this->entitiesService->getGuarded())) {
+            return;
+        }
+
+        if ($columnType === 'DateTime') {
+            $this->{$columnName} = DateTime::createFromFormat('U', $params[0]);
+            return;
+        }
+
+        $this->{$columnName} = $params[0];
     }
 }

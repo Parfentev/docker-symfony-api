@@ -8,8 +8,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Exception;
 
 /**
- * @method setCode($value)
- * @method setUserData($value)
+ * @method int getExpiresAt()
+ * @method self setExpiresAt(int $value)
  */
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Entity, ORM\Table(name: 'verification_codes')]
@@ -33,21 +33,11 @@ class CodeEntity extends AbstractEntity
     public function __construct()
     {
         parent::__construct();
-        $time = time();
 
-        $this->setCode(hexdec(bin2hex(random_bytes(2))) % 9000 + 1000);
-        $this->setUserData($_SERVER['HTTP_USER_AGENT'] ?? '');
-        $this->setExpiresAt($time + $this->expiresIn);
-    }
+        $this->code   = hexdec(bin2hex(random_bytes(2))) % 9000 + 1000;
+        $this->userId = $_SERVER['HTTP_USER_AGENT'] ?? '';
 
-    public function setExpiresAt($time): void
-    {
-        $this->expiresAt = DateTime::createFromFormat('U', $time);
-    }
-
-    public function getExpiresAt(): int
-    {
-        return $this->expiresAt->getTimestamp();
+        $this->setExpiresAt(time() + $this->expiresIn);
     }
 
     public function compareCode($value): bool

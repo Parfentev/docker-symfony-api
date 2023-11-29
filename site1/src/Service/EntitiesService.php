@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Annotation\EntityProperty;
+use Exception;
 use ReflectionClass;
 use ReflectionProperty;
 
@@ -45,7 +46,8 @@ class EntitiesService
             $properties = $entityReflection->getProperties(ReflectionProperty::IS_PROTECTED);
             // Удаляем все статичные свойства из списка
             $this->properties = array_filter($properties, fn($prop) => !$prop->isStatic());
-        } catch (\Exception $e) {}
+            $this->properties = array_column($this->properties, null, 'name');
+        } catch (Exception) {}
     }
 
     public function getAllowedFields(): array
@@ -56,5 +58,12 @@ class EntitiesService
     public function getGuarded(): array
     {
         return $this->guarded;
+    }
+
+    public function getPropertyType(string $name): string
+    {
+        return !empty($this->properties[$name])
+            ? $this->properties[$name]->getType()
+            : '';
     }
 }

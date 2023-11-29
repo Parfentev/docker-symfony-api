@@ -8,6 +8,12 @@ use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
 
+/**
+ * @method int getExpiresAt()
+ * @method self setExpiresAt(int $value)
+ * @method int getRefreshExpiresAt()
+ * @method self setRefreshExpiresAt(int $value)
+ */
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Entity, ORM\Table(name: 'oauth_access')]
 class AccessEntity extends AbstractEntity
@@ -39,46 +45,24 @@ class AccessEntity extends AbstractEntity
     #[ORM\Column(type: 'string', length: 80)]
     protected string $clientId;
 
-    public function setExpiresAt($time): void
-    {
-        $this->expiresAt = DateTime::createFromFormat('U', $time);
-    }
-
-    public function getExpiresAt(): int
-    {
-        return $this->expiresAt->getTimestamp();
-    }
-
-    public function setRefreshExpiresAt($time): void
-    {
-        $this->refreshExpiresAt = DateTime::createFromFormat('U', $time);
-    }
-
-    public function getRefreshExpiresAt(): int
-    {
-        return $this->refreshExpiresAt->getTimestamp();
-    }
-
     /**
-     * @param int $userId
-     *
-     * @return $this
      * @throws Exception
      */
-    public function generateTokens(int $userId): static
+    public function __construct(int $userId)
     {
+        parent::__construct();
+        $time = time();
+
         $this->accessToken  = $this->generateToken($userId);
         $this->refreshToken = $this->generateToken($userId);
 
-        $time = time();
-        $this->setExpiresAt($time + $this->expiresIn);
-        $this->setRefreshExpiresAt($time + $this->refreshExpiresIn);
+        $this
+            ->setExpiresAt($time + $this->expiresIn)
+            ->setRefreshExpiresAt($time + $this->refreshExpiresIn);
 
         $this->userId   = $userId;
         $this->userData = $_SERVER['HTTP_USER_AGENT'] ?? '';
-        $this->clientId = 'test';
-
-        return $this;
+        $this->clientId = 'web';
     }
 
     /**
