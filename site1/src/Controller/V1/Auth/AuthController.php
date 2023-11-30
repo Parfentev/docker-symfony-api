@@ -2,20 +2,20 @@
 
 namespace App\Controller\V1\Auth;
 
-use App\Controller\V1\AbstractController;
 use App\Entity\Auth\AccessEntity;
 use App\Entity\Auth\CodeEntity;
 use App\Entity\Users\UserEntity;
-use App\Exception\CustomException;
-use App\Exception\InvalidArgumentException;
-use App\Exception\InvalidCredentialsException;
-use App\Exception\NotFoundException;
-use App\Service\AuthService;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use SymfonyApiBase\Controller\AbstractController;
+use SymfonyApiBase\Exception\CustomException;
+use SymfonyApiBase\Exception\InvalidArgumentException;
+use SymfonyApiBase\Exception\InvalidCredentialsException;
+use SymfonyApiBase\Exception\NotFoundException;
+use SymfonyApiBase\Service\AuthService;
 
 #[Route('/api/v1/users')]
 class AuthController extends AbstractController
@@ -102,26 +102,21 @@ class AuthController extends AbstractController
      */
     private function generateTokens(int $userId): AccessEntity
     {
-        $entity      = new AccessEntity();
         $maxAttempts = 3;
         $attempts    = 0;
 
         do {
             try {
-                $entity->generateTokens($userId);
+                $entity = new AccessEntity($userId);
                 $this->entityManager->persist($entity);
                 $this->entityManager->flush();
-                break;
+                return $entity;
             } catch (UniqueConstraintViolationException|Exception) {
                 $attempts++;
             }
         } while ($attempts < $maxAttempts);
 
-        if ($attempts === $maxAttempts) {
-            throw new CustomException('Не удалось создать токен после нескольких попыток.');
-        }
-
-        return $entity;
+        throw new CustomException('Не удалось создать токен после нескольких попыток.');
     }
 
     private function authByEmailAndPassword(array $params): array

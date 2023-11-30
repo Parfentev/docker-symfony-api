@@ -2,10 +2,10 @@
 
 namespace App\Entity\Auth;
 
-use App\Entity\AbstractEntity;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
+use SymfonyApiBase\Entity\AbstractEntity;
 
 /**
  * @method int getExpiresAt()

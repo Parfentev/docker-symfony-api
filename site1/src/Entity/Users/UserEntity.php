@@ -2,11 +2,11 @@
 
 namespace App\Entity\Users;
 
-use App\Annotation\EntityProperty;
-use App\Entity\AbstractEntity;
-use App\Service\AuthService;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
+use SymfonyApiBase\Annotation\EntityProperty;
+use SymfonyApiBase\Entity\AbstractEntity;
+use SymfonyApiBase\Service\AuthService;
 
 /**
  * @method int getId()

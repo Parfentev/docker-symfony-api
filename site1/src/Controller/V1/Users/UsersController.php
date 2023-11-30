@@ -2,10 +2,10 @@
 
 namespace App\Controller\V1\Users;
 
-use App\Controller\V1\AbstractController;
 use App\Entity\Users\UserEntity;
-use App\Trait\Controller\{ListTrait, ReadTrait, UpdateTrait};
 use Symfony\Component\Routing\Annotation\Route;
+use SymfonyApiBase\Controller\AbstractController;
+use SymfonyApiBase\Trait\Controller\{ListTrait, ReadTrait, UpdateTrait};
 
 #[Route('/api/v1/users')]
 class UsersController extends AbstractController
