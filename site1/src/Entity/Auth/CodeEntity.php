@@ -11,7 +11,6 @@ use SymfonyApiBase\Entity\AbstractEntity;
  * @method int getExpiresAt()
  * @method self setExpiresAt(int $value)
  */
-#[ORM\HasLifecycleCallbacks]
 #[ORM\Entity, ORM\Table(name: 'verification_codes')]
 class CodeEntity extends AbstractEntity
 {
@@ -32,8 +31,6 @@ class CodeEntity extends AbstractEntity
      */
     public function __construct()
     {
-        parent::__construct();
-
         $this->code   = hexdec(bin2hex(random_bytes(2))) % 9000 + 1000;
         $this->userId = $_SERVER['HTTP_USER_AGENT'] ?? '';
 

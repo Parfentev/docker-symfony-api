@@ -15,7 +15,6 @@ use SymfonyApiBase\Service\AuthService;
  * @method int getUpdatedAt()
  * @method self setUpdatedAt(int $value)
  */
-#[ORM\HasLifecycleCallbacks]
 #[ORM\Entity, ORM\Table(name: 'users')]
 class UserEntity extends AbstractEntity
 {
@@ -42,7 +41,6 @@ class UserEntity extends AbstractEntity
 
     public function __construct()
     {
-        parent::__construct();
         $time = time();
 
         $this->setCreatedAt($time);

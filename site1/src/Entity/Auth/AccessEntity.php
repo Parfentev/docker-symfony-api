@@ -14,7 +14,6 @@ use SymfonyApiBase\Entity\AbstractEntity;
  * @method int getRefreshExpiresAt()
  * @method self setRefreshExpiresAt(int $value)
  */
-#[ORM\HasLifecycleCallbacks]
 #[ORM\Entity, ORM\Table(name: 'oauth_access')]
 class AccessEntity extends AbstractEntity
 {
@@ -50,7 +49,6 @@ class AccessEntity extends AbstractEntity
      */
     public function __construct(int $userId)
     {
-        parent::__construct();
         $time = time();
 
         $this->accessToken  = $this->generateToken($userId);
