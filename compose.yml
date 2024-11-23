@@ -1,7 +1,6 @@
-version: "3.8"
-
 services:
     nginx:
+        container_name: nginx
         image: nginx:latest
         env_file:
             - .env
@@ -9,21 +8,23 @@ services:
             - "80:80"
         volumes:
             - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
-            - ./site1:/var/www/site1
+            - ./../site1:/var/www/site1
         depends_on:
             - php
+            - front
 
     php:
-        build:
-            context: ./docker/php
+        container_name: php
+        build: ./docker/php
         env_file:
             - .env
         volumes:
-            - ./site1:/var/www/site1
+            - ./../site1:/var/www/site1
         depends_on:
             - database
 
     database:
+        container_name: database
         image: postgres
         environment:
             POSTGRES_DB: ${POSTGRES_DB}
@@ -33,6 +34,22 @@ services:
             - "5432"
 
     adminer:
+        container_name: adminer
         image: adminer
         ports:
             - "8080:8080"
+
+    front:
+        container_name: front
+        build: ./docker/react
+        volumes:
+            - ./../mymoney-react:/app
+            #- ./../mymoney-react/node_modules:/app/node_modules
+            #- ./../mymoney-react/.next:/app/.next
+        ports:
+            - "3000:3000"
+        environment:
+            - NODE_ENV=development
+            - CHOKIDAR_USEPOLLING=true
+            - WATCHPACK_POLLING=true
+            - FAST_REFRESH=true

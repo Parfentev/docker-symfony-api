@@ -1,12 +1,1 @@
 /.idea
-/*/bin
-/*/config
-/*/migrations
-/*/public
-/*/public/bundles
-/*/src/*/.gitignore
-/*/var
-/*/vendor
-/site1/.gitignore
-/site1/composer.lock
-/site1/symfony.lock
